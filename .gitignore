@@ -1,5 +1,4 @@
 .venv
 .idea
 screenshots
-__init__.py
 __pycache__/
