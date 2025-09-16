@@ -1,5 +1,5 @@
 def test_search_product_and_verify_navigation(home_page, catalog_page, product_details_page):
-    # selecting and verifying third product
+    # variable that stores number of the product to check
     product_number = 3
     home_page.open_page()
     # don't need accept_cookie_consent() in headless mode

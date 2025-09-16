@@ -1,6 +1,3 @@
-import os
-from datetime import datetime
-
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -8,13 +5,7 @@ from selenium.webdriver.chrome.options import Options
 from pages.catalog.catalog_page import CatalogPage
 from pages.catalog.product_details_page import ProductDetailsPage
 from pages.main_site.home_page import HomePage
-
-
-@pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-    outcome = yield
-    rep = outcome.get_result()
-    setattr(item, "rep_" + rep.when, rep)
+from utils.screenshot import take_screenshot
 
 
 @pytest.fixture
@@ -24,8 +15,9 @@ def driver(request):
     chrome_driver = webdriver.Chrome(options=chrome_options)
     chrome_driver.set_window_size(1024, 768)
     yield chrome_driver
-    if request.node.rep_call.failed:
+    if request.session.testsfailed > 0:
         take_screenshot(chrome_driver, request.node.name)
+    chrome_driver.quit()
 
 
 @pytest.fixture
@@ -41,14 +33,3 @@ def catalog_page(driver):
 @pytest.fixture
 def product_details_page(driver):
     yield ProductDetailsPage(driver)
-
-
-def take_screenshot(driver, test_name):
-    try:
-        os.makedirs("screenshots", exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"screenshots/{test_name}_{timestamp}.png"
-        driver.save_screenshot(filename)
-        print(f"Screenshot: {filename}")
-    except Exception as e:
-        print(f"Screenshot failed: {e}")
